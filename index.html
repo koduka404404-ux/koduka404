@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>反射神経テスト</title>
+<style>
+  body { font-family: sans-serif; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; margin: 0; background: #1a1a2e; color: white; }
+  h1 { font-size: 1.8rem; margin-bottom: 8px; }
+  p { color: #aaa; margin-bottom: 32px; }
+  #game-area { width: 300px; height: 300px; border-radius: 16px; background: #16213e; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; cursor: pointer; user-select: none; transition: background 0.1s; border: 2px solid #0f3460; }
+  #game-area.ready { background: #e94560; }
+  #game-area.go { background: #00b894; }
+  #result { margin-top: 24px; font-size: 1.1rem; min-height: 32px; }
+  #history { margin-top: 16px; font-size: 0.9rem; color: #aaa; text-align: center; }
+  #score-history { margin-top: 8px; font-size: 0.9rem; color: #cfd8ff; text-align: center; line-height: 1.6; }
+  #reset { margin-top: 24px; padding: 10px 28px; background: #0f3460; color: white; border: none; border-radius: 8px; font-size: 1rem; cursor: pointer; display: none; }
+  #reset:hover { background: #e94560; }
+</style>
+</head>
+<body>
+<h1>反射神経テスト</h1>
+<p>緑になったらすぐタップ！3回計測して平均を出します</p>
+<div id="game-area" onclick="handleClick()">タップしてスタート</div>
+<div id="result"></div>
+<div id="history"></div>
+<div id="score-history"></div>
+<button id="reset" onclick="resetGame()">もう一度</button>
+<script>
+  let state='idle',startTime=null,waitTimer=null,results=[];
+  let scoreHistory = JSON.parse(localStorage.getItem('reactionScoreHistory') || '[]');
+
+  function handleClick(){if(state==='idle'){startWaiting();}else if(state==='waiting'){tooEarly();}else if(state==='go'){measure();}}
+  function startWaiting(){state='waiting';const a=document.getElementById('game-area');a.className='ready';a.textContent='待って...';document.getElementById('result').textContent='';const d=1500+Math.random()*3000;waitTimer=setTimeout(showGo,d);}
+  function showGo(){state='go';startTime=Date.now();const a=document.getElementById('game-area');a.className='go';a.textContent='今！';}
+  function tooEarly(){clearTimeout(waitTimer);state='idle';const a=document.getElementById('game-area');a.className='';a.textContent='フライング！タップしてやり直し';document.getElementById('result').textContent='⚠️ 早すぎました';}
+  function measure(){const t=Date.now()-startTime;results.push(t);state='idle';const a=document.getElementById('game-area');a.className='';if(results.length<3){a.textContent=`${results.length}/3回完了！タップして次へ`;document.getElementById('result').textContent=`今回: ${t}ms`;updateHistory();}else{const avg=Math.round(results.reduce((a,b)=>a+b)/3);a.textContent='完了！';document.getElementById('result').textContent=`平均: ${avg}ms ${getRating(avg)}`;updateHistory();saveScore(avg);document.getElementById('reset').style.display='inline-block';}}
+  function updateHistory(){document.getElementById('history').textContent=results.map((r,i)=>`${i+1}回目: ${r}ms`).join('　');}
+  function getRating(avg){if(avg<180)return'🏆 超人級！';if(avg<220)return'⚡ かなり速い！';if(avg<270)return'👍 平均以上';if(avg<350)return'😊 普通';return'🐢 もう少し！';}
+
+  function saveScore(avg) {
+    scoreHistory.unshift(avg);
+    scoreHistory = scoreHistory.slice(0, 5);
+    localStorage.setItem('reactionScoreHistory', JSON.stringify(scoreHistory));
+    renderScoreHistory();
+  }
+
+  function renderScoreHistory() {
+    const e = document.getElementById('score-history');
+    if (scoreHistory.length === 0) {
+      e.textContent = 'スコア履歴: まだ記録がありません';
+      return;
+    }
+    e.textContent = `スコア履歴（新しい順・過去${scoreHistory.length}件）: ` + scoreHistory.map((s, i) => `${i + 1}. ${s}ms`).join(' / ');
+  }
+
+  function resetGame(){results=[];state='idle';document.getElementById('game-area').className='';document.getElementById('game-area').textContent='タップしてスタート';document.getElementById('result').textContent='';document.getElementById('history').textContent='';document.getElementById('reset').style.display='none';}
+
+  renderScoreHistory();
+</script>
+</body>
+</html>
