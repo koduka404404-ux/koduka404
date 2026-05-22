@@ -394,6 +394,25 @@
       border-top: 1px solid #ddd;
     }
 
+    .manga-link {
+      display: inline-block;
+      margin-top: 8px;
+      background: linear-gradient(135deg, #ffb7c5, #ff8fab);
+      color: #fff;
+      text-decoration: none;
+      padding: 8px 24px;
+      border-radius: 20px;
+      font-weight: 700;
+      font-size: 13px;
+      letter-spacing: 1px;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .manga-link:hover {
+      transform: scale(1.05);
+      box-shadow: 0 3px 12px rgba(0,0,0,0.2);
+    }
+
     /* Animations */
     @keyframes fadeIn {
       from { opacity: 0; transform: translateY(10px); }
@@ -702,7 +721,8 @@
 
   <!-- Footer -->
   <div class="exam-footer">
-    令和7年度 恋愛センター試験 ― Kyoya & Yumi ―
+    令和7年度 恋愛センター試験 ― Kyoya & Yumi ―<br>
+    <a href="manga.html" class="manga-link">📖 ふたりの物語を読む</a>
   </div>
 </div>
 

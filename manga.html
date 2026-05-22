@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kyoya & Yumi ～ふたりの物語～</title>
+  <link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400;700;900&family=Noto+Serif+JP:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: #1a1a2e;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 16px;
+      font-family: 'Zen Maru Gothic', sans-serif;
+    }
+
+    .manga-page {
+      width: 100%;
+      max-width: 900px;
+      background: #fff;
+      border-radius: 4px;
+      box-shadow: 0 8px 40px rgba(0,0,0,0.5);
+      overflow: hidden;
+      position: relative;
+    }
+
+    /* Title banner */
+    .manga-title {
+      background: linear-gradient(135deg, #ffb7c5 0%, #ff8fab 50%, #ffb7c5 100%);
+      text-align: center;
+      padding: 18px 20px 14px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .manga-title::before {
+      content: '✿ ✿ ✿ ✿ ✿ ✿ ✿ ✿ ✿ ✿ ✿ ✿ ✿ ✿ ✿ ✿ ✿ ✿ ✿ ✿';
+      position: absolute;
+      top: 2px;
+      left: 0;
+      right: 0;
+      font-size: 10px;
+      color: rgba(255,255,255,0.5);
+      letter-spacing: 4px;
+    }
+
+    .manga-title h1 {
+      font-family: 'Noto Serif JP', serif;
+      font-size: 26px;
+      color: #fff;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+      letter-spacing: 6px;
+    }
+
+    .manga-title .subtitle {
+      font-size: 13px;
+      color: rgba(255,255,255,0.9);
+      margin-top: 4px;
+      letter-spacing: 3px;
+    }
+
+    /* Grid layout for panels */
+    .panels {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      grid-template-rows: auto auto auto;
+      gap: 3px;
+      padding: 3px;
+      background: #000;
+    }
+
+    .panel {
+      position: relative;
+      overflow: hidden;
+      background: #fff;
+    }
+
+    .panel img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    /* Panel-specific sizes */
+    .panel-1 { grid-column: 1; grid-row: 1; }
+    .panel-2 { grid-column: 2; grid-row: 1; }
+    .panel-3 { grid-column: 1 / span 2; grid-row: 2; height: 260px; }
+    .panel-4 { grid-column: 1; grid-row: 3; }
+    .panel-5 { grid-column: 2; grid-row: 3; }
+
+    .panel-1, .panel-2 { height: 240px; }
+    .panel-4, .panel-5 { height: 240px; }
+
+    /* Speech bubbles */
+    .bubble {
+      position: absolute;
+      background: #fff;
+      border: 2px solid #333;
+      border-radius: 20px;
+      padding: 8px 14px;
+      font-size: 13px;
+      font-weight: 700;
+      color: #333;
+      line-height: 1.5;
+      max-width: 65%;
+      z-index: 10;
+      box-shadow: 1px 1px 3px rgba(0,0,0,0.15);
+    }
+
+    .bubble::after {
+      content: '';
+      position: absolute;
+      width: 0;
+      height: 0;
+    }
+
+    .bubble.bottom-left::after {
+      bottom: -12px;
+      left: 20px;
+      border-left: 8px solid transparent;
+      border-right: 8px solid transparent;
+      border-top: 12px solid #333;
+    }
+
+    .bubble.bottom-right::after {
+      bottom: -12px;
+      right: 20px;
+      border-left: 8px solid transparent;
+      border-right: 8px solid transparent;
+      border-top: 12px solid #333;
+    }
+
+    .bubble.top-left::after {
+      top: -12px;
+      left: 20px;
+      border-left: 8px solid transparent;
+      border-right: 8px solid transparent;
+      border-bottom: 12px solid #333;
+    }
+
+    /* Narration boxes */
+    .narration {
+      position: absolute;
+      background: rgba(0, 0, 0, 0.7);
+      color: #fff;
+      padding: 6px 12px;
+      font-size: 11px;
+      letter-spacing: 1px;
+      line-height: 1.6;
+      z-index: 10;
+    }
+
+    /* Sound effects */
+    .sfx {
+      position: absolute;
+      font-family: 'Noto Serif JP', serif;
+      font-weight: 900;
+      color: #fff;
+      text-shadow: 
+        -2px -2px 0 #333,
+        2px -2px 0 #333,
+        -2px 2px 0 #333,
+        2px 2px 0 #333,
+        0 3px 6px rgba(0,0,0,0.3);
+      z-index: 10;
+      letter-spacing: 2px;
+    }
+
+    /* Panel number labels */
+    .panel-label {
+      position: absolute;
+      top: 8px;
+      left: 8px;
+      background: #ff8fab;
+      color: #fff;
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      font-weight: 900;
+      z-index: 15;
+      box-shadow: 1px 1px 3px rgba(0,0,0,0.3);
+    }
+
+    /* Sparkle effects */
+    .sparkle {
+      position: absolute;
+      font-size: 16px;
+      z-index: 10;
+      animation: sparkle 2s ease-in-out infinite;
+    }
+
+    @keyframes sparkle {
+      0%, 100% { opacity: 0.3; transform: scale(0.8); }
+      50% { opacity: 1; transform: scale(1.2); }
+    }
+
+    /* Heart effects */
+    .heart {
+      position: absolute;
+      z-index: 10;
+      animation: float-heart 3s ease-in-out infinite;
+    }
+
+    @keyframes float-heart {
+      0%, 100% { transform: translateY(0) scale(1); opacity: 0.7; }
+      50% { transform: translateY(-8px) scale(1.1); opacity: 1; }
+    }
+
+    /* Bottom panel - full width love scene */
+    .panel-final {
+      grid-column: 1 / span 2;
+      grid-row: 4;
+      height: 200px;
+      position: relative;
+    }
+
+    /* Footer */
+    .manga-footer {
+      background: linear-gradient(135deg, #ffb7c5 0%, #ff8fab 100%);
+      text-align: center;
+      padding: 12px 10px;
+      font-size: 12px;
+      color: #fff;
+      letter-spacing: 2px;
+    }
+
+    .manga-footer a {
+      display: inline-block;
+      margin-top: 6px;
+      background: #fff;
+      color: #ff6b8a;
+      text-decoration: none;
+      padding: 6px 20px;
+      border-radius: 20px;
+      font-weight: 700;
+      font-size: 13px;
+      letter-spacing: 1px;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .manga-footer a:hover {
+      transform: scale(1.05);
+      box-shadow: 0 3px 12px rgba(0,0,0,0.2);
+    }
+
+    /* Responsive */
+    @media (max-width: 600px) {
+      .manga-title h1 { font-size: 20px; letter-spacing: 4px; }
+      .manga-title .subtitle { font-size: 11px; }
+      .bubble { font-size: 11px; padding: 6px 10px; }
+      .narration { font-size: 10px; }
+      .panel-1, .panel-2 { height: 180px; }
+      .panel-3 { height: 200px; }
+      .panel-4, .panel-5 { height: 180px; }
+      .panel-final { height: 160px; }
+      .sfx { font-size: inherit; }
+      .panel-label { width: 22px; height: 22px; font-size: 11px; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="manga-page">
+  <!-- Title -->
+  <div class="manga-title">
+    <h1>Kyoya & Yumi</h1>
+    <div class="subtitle">～ ふたりの物語 ～</div>
+  </div>
+
+  <!-- Panels -->
+  <div class="panels">
+
+    <!-- Panel 1: First date in Shinjuku -->
+    <div class="panel panel-1">
+      <div class="panel-label">1</div>
+      <img src="manga/panel1_shinjuku.jpg" alt="新宿での初デート">
+      <div class="narration" style="top:0; left:0; right:0;">
+        はじまりは、新宿の街だった——
+      </div>
+      <div class="bubble bottom-left" style="bottom: 20px; left: 10px; max-width: 55%;">
+        初めてのデート…<br>ドキドキする…！
+      </div>
+      <span class="sparkle" style="top: 40px; right: 15px; animation-delay: 0.3s;">✧</span>
+      <span class="sparkle" style="top: 60px; right: 40px; animation-delay: 0.8s;">✦</span>
+    </div>
+
+    <!-- Panel 2: Walking in Machida -->
+    <div class="panel panel-2">
+      <div class="panel-label">2</div>
+      <img src="manga/panel2_walking.jpg" alt="町田デート">
+      <div class="bubble bottom-right" style="bottom: 18px; right: 10px; max-width: 60%;">
+        町田、相模大野…<br>どこ行っても楽しいな♪
+      </div>
+      <span class="heart" style="top: 15px; right: 12px; font-size: 18px; animation-delay: 0.5s;">💕</span>
+      <span class="sparkle" style="top: 30px; left: 15px;">✧</span>
+    </div>
+
+    <!-- Panel 3: Rainy day date (wide) -->
+    <div class="panel panel-3">
+      <div class="panel-label">3</div>
+      <img src="manga/panel3_rain.jpg" alt="雨の日デート in 町田">
+      <div class="sfx" style="top: 15px; right: 20px; font-size: 28px; transform: rotate(-8deg);">
+        ザァァ…
+      </div>
+      <div class="bubble bottom-left" style="bottom: 20px; left: 15px; max-width: 40%;">
+        雨でも幸せ…<br>だって一緒だもん。
+      </div>
+      <div class="narration" style="top: 0; right: 0; padding: 6px 14px;">
+        町田——雨の日のデート
+      </div>
+      <span class="sparkle" style="bottom: 15px; right: 20px; font-size: 20px;">✿</span>
+    </div>
+
+    <!-- Panel 4: Karaoke -->
+    <div class="panel panel-4">
+      <div class="panel-label">4</div>
+      <img src="manga/panel4_karaoke.jpg" alt="カラオケ4回目">
+      <div class="sfx" style="top: 10px; left: 50%; transform: translateX(-50%) rotate(5deg); font-size: 24px;">
+        ♪♫♪
+      </div>
+      <div class="bubble top-left" style="top: 45px; left: 8px; max-width: 55%;">
+        もう4回目！<br>歌うのたのしい～！
+      </div>
+      <span class="heart" style="bottom: 12px; right: 15px; font-size: 16px;">🎤</span>
+    </div>
+
+    <!-- Panel 5: Buying letters -->
+    <div class="panel panel-5">
+      <div class="panel-label">5</div>
+      <img src="manga/panel5_letter.jpg" alt="Kyoyaからの手紙">
+      <div class="narration" style="top: 0; left: 0; right: 0;">
+        目黒、横浜、都立大学——
+      </div>
+      <div class="bubble bottom-right" style="bottom: 15px; right: 8px; max-width: 60%;">
+        Kyoyaからの手紙…<br>宝物だよ。
+      </div>
+      <span class="heart" style="top: 40px; right: 12px; font-size: 14px; animation-delay: 1s;">💌</span>
+      <span class="sparkle" style="bottom: 60px; left: 12px; animation-delay: 0.6s;">✧</span>
+    </div>
+
+    <!-- Panel 6: Together (full width finale) -->
+    <div class="panel panel-final">
+      <div class="panel-label" style="background: #e74c7b;">♥</div>
+      <img src="manga/panel6_together.jpg" alt="ユミの笑顔">
+      <div class="bubble bottom-left" style="bottom: 25px; left: 15px; max-width: 45%; border-color: #e74c7b;">
+        これからもずっと…<br>一緒にいようね。
+      </div>
+      <span class="heart" style="top: 10px; left: 50%; font-size: 22px; animation-delay: 0s;">💗</span>
+      <span class="heart" style="top: 20px; left: 30%; font-size: 16px; animation-delay: 0.7s;">💕</span>
+      <span class="heart" style="top: 15px; right: 25%; font-size: 18px; animation-delay: 1.3s;">💖</span>
+      <span class="sparkle" style="top: 50px; left: 10px; font-size: 20px;">✿</span>
+      <span class="sparkle" style="top: 45px; right: 10px; font-size: 18px; animation-delay: 0.4s;">✧</span>
+      <div class="narration" style="bottom: 0; left: 0; right: 0; text-align: center; font-size: 12px; letter-spacing: 3px; background: rgba(0,0,0,0.5);">
+        これからも、ふたりの物語は続いていく——
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Footer -->
+  <div class="manga-footer">
+    Kyoya & Yumi ～ ふたりの物語 ～ 完<br>
+    <a href="index.html">💕 恋愛センター試験に挑戦する →</a>
+  </div>
+</div>
+
+</body>
+</html>
